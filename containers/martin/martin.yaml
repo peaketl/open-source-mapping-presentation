@@ -10,32 +10,6 @@ postgres:
   auto_publish:
     tables: true
     from_schemas: public
-
-  tables:
-    crimes:
-      schema:          public
-      table:           crimes
-      srid:            4326
-      geometry_column: geom
-      id_column:       id
-      minzoom:         8
-      maxzoom:         18
-      # Columns to include as vector tile properties
-      properties:
-        id:            integer
-        title:         text
-        victim:        text
-        year:          integer
-        crime_type:    text
-        weapon:        text
-        location_name: text
-        neighborhood:  text
-        solved:        boolean
-        season:        integer
-        episode:       text
-        description:   text
-        lat:           double precision
-        lon:           double precision
         
 # Martin web server settings
 listen_addresses: "0.0.0.0:3000"
