@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homicide Hunter — Colorado Springs Crime Map</title>
+
+  <!-- MapLibre GL JS (open-source, no API key required) -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+  <script      src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ── Header ──────────────────────────────────────────────── -->
+  <header>
+    <span class="badge">🔍</span>
+    <div>
+      <h1>Homicide Hunter — <span>Colorado Springs</span></h1>
+      <div class="subtitle">Lt. Joe Kenda · 1977–1996 · PostGIS + Martin + MapLibre GL</div>
+    </div>
+  </header>
+
+  <!-- ── Layout ──────────────────────────────────────────────── -->
+  <div class="layout">
+
+    <!-- ── Sidebar ───────────────────────────────────────────── -->
+    <aside class="sidebar">
+
+      <!-- Stats -->
+      <div class="sidebar-section">
+        <h2>Case Statistics</h2>
+        <div class="stats">
+          <div class="stat">
+            <span class="num" id="stat-total">—</span>
+            <span class="label">Total</span>
+          </div>
+          <div class="stat">
+            <span class="num" id="stat-solved">—</span>
+            <span class="label">Solved</span>
+          </div>
+          <div class="stat">
+            <span class="num" id="stat-unsolved">—</span>
+            <span class="label">Unsolved</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="sidebar-section">
+        <h2>Filters</h2>
+        <div class="filter-group">
+          <select id="filter-season">
+            <option value="all">All Seasons</option>
+            <option value="1">Season 1</option>
+            <option value="2">Season 2</option>
+            <option value="3">Season 3</option>
+            <option value="4">Season 4</option>
+            <option value="5">Season 5</option>
+            <option value="6">Season 6</option>
+            <option value="7">Season 7</option>
+            <option value="8">Season 8</option>
+            <option value="9">Season 9</option>
+          </select>
+
+          <select id="filter-solved">
+            <option value="all">All Cases</option>
+            <option value="solved">Solved Only</option>
+            <option value="unsolved">Unsolved Only</option>
+          </select>
+
+          <div class="range-row">
+            <span>Year ≤</span>
+            <input type="range" id="filter-year"
+                   min="1977" max="1996" value="1996" step="1">
+            <span id="year-label">1996</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Legend -->
+      <div class="sidebar-section">
+        <h2>Legend</h2>
+        <div class="legend-items">
+          <div class="legend-item">
+            <div class="dot solved"></div>
+            <span>Solved homicide</span>
+          </div>
+          <div class="legend-item">
+            <div class="dot unsolved"></div>
+            <span>Unsolved / cold case</span>
+          </div>
+          <div class="legend-item">
+            <div class="dot multi"></div>
+            <span>Mass / multiple victims</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Case list -->
+      <div id="case-list" class="case-list"></div>
+
+    </aside>
+
+    <!-- ── Map ───────────────────────────────────────────────── -->
+    <div id="map"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

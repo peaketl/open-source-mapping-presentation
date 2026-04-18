@@ -1,0 +1,5 @@
+FROM docker.io/postgis/postgis:18-3.6
+
+COPY schema.sql /docker-entrypoint-initdb.d/kenda_cases_schema.sql
+
+EXPOSE 5432
