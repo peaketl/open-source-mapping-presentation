@@ -38,13 +38,13 @@ open-source-mapping-presentation/
 
 ## How It Works
 
-1. load_data.py reads crimes.json and bulk inserts cases into the crimes table.
-2. PostGIS schema is initialized from containers/postgis/schema.sql.
+1. `load_data.py` reads `crimes.json` and bulk inserts cases into the crimes table.
+2. PostGIS schema is initialized from `containers/postgis/schema.sql`.
 3. Martin auto-publishes Postgres tables from the public schema and serves vector tiles.
-4. Frontend behavior in app.js:
+4. Frontend behavior in `app.js`:
    - map points and labels are rendered from Martin vector tiles
-   - sidebar/statistics/filter list are populated from local crimes.json
-5. Nginx serves index.html, style.css, app.js, and crimes.json on port 8088.
+   - sidebar/statistics/filter list are populated from local `crimes.json`
+5. Nginx serves `index.html`, `style.css`, `app.js`, and `crimes.json` on port 8088.
 
 Default ports:
 
@@ -67,7 +67,7 @@ Optional:
 
 ### 1. Configure environment
 
-Create .env from .env.sample:
+Create `.env` from `.env.sample`:
 
 ```bash
 cp .env.sample .env
@@ -98,7 +98,7 @@ What start.sh does:
 
 - builds PostGIS, Martin, and Nginx images
 - starts containers and maps service ports
-- runs load_data.py to populate the crimes table
+- runs `load_data.py` to populate the crimes table
 
 ### 4. Open the demo
 
@@ -166,23 +166,22 @@ podman run -d --replace --name open-source-mapping-presentation-nginx \
 
 ## Known Operational Notes
 
-- start.sh currently uses an absolute host path for the Nginx volume mount. If your checkout path differs, edit that line or use the manual Nginx command above with $PWD.
-- start.sh removes prior containers using names that include :latest in the rm commands. Startup still works because each podman run uses --replace, but those rm lines can be cleaned up later.
+- `start.sh` currently uses an absolute host path for the Nginx volume mount. If your checkout path differs, edit that line or use the manual Nginx command above with `$PWD`.
 - The frontend references the OpenFreeMap dark style URL, so internet access is required for the base map style/tiles.
 
 ## Troubleshooting
 
 - Martin cannot connect to Postgres:
-  - verify DATABASE_URL in .env
+  - verify DATABASE_URL in `.env`
   - ensure PostGIS is running on 5432
 - Map loads, but no case points:
-  - verify Martin /health endpoint returns OK
+  - verify Martin `/health` endpoint returns OK
   - verify crimes table has rows
 - Sidebar appears, but map markers do not:
-  - the sidebar uses local crimes.json; the map still requires Martin tiles
-- load_data.py fails:
-  - install requirements: python3 -m pip install -r requirements.txt
-  - verify .env credentials and database name
+  - the sidebar uses local `crimes.json`; the map still requires Martin tiles
+- `load_data.py` fails:
+  - install requirements: `python3 -m pip install -r requirements.txt`
+  - verify `.env` credentials and database name
 
 ## Tech Stack
 
