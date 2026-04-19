@@ -1,26 +1,16 @@
 # Homicide Hunter Crime Map
-### Colorado Springs Open-Source Users Group Demo
 
-This repository is a live demo stack for presenting open-source geospatial tooling to the Colorado Springs open-source community.
+Open-source geospatial demo that visualizes Colorado Springs homicide case data from Homicide Hunter episodes.
 
-It shows how to:
+This project demonstrates an end-to-end stack:
 
-- Store data in PostGIS
-- Publish vector tiles with Martin
-- Render interactive web maps with MapLibre GL JS
-- Serve a static frontend with Nginx
-- Load JSON data into Postgres/PostGIS with Python
+- PostgreSQL + PostGIS for spatial storage
+- Martin for vector tile publishing
+- MapLibre GL JS for browser rendering
+- Nginx for static hosting
+- Python for dataset ingest
 
-The map centers on Lt. Joe Kenda case data in Colorado Springs.
-
-## Demo Goals
-
-- Highlight a complete open-source mapping pipeline end-to-end
-- Keep deployment simple with Podman container images
-- Use readable, hackable config for meetup walkthroughs
-- Provide a real dataset that demonstrates filters, popups, and vector tiles
-
-## Current Project Layout
+## What This Repository Contains
 
 ```text
 open-source-mapping-presentation/
@@ -31,6 +21,7 @@ open-source-mapping-presentation/
 ├── load_data.py
 ├── start.sh
 ├── .env.sample
+├── requirements.txt
 ├── containers/
 │   ├── postgis/
 │   │   ├── Containerfile
@@ -41,38 +32,48 @@ open-source-mapping-presentation/
 │   └── nginx/
 │       ├── Containerfile
 │       └── nginx.conf
-└── README.md
+└── presentation/
+    └── icons/
 ```
 
-## Architecture
+## How It Works
 
-1. `crimes.json` is loaded into PostGIS by `load_data.py`
-2. Martin reads from PostGIS and exposes vector tiles for `crimes`
-3. `index.html` + `app.js` render the map and interactive UI
-4. Nginx serves the frontend static files from the repo root
+1. load_data.py reads crimes.json and bulk inserts cases into the crimes table.
+2. PostGIS schema is initialized from containers/postgis/schema.sql.
+3. Martin auto-publishes Postgres tables from the public schema and serves vector tiles.
+4. Frontend behavior in app.js:
+   - map points and labels are rendered from Martin vector tiles
+   - sidebar/statistics/filter list are populated from local crimes.json
+5. Nginx serves index.html, style.css, app.js, and crimes.json on port 8088.
 
-Default service ports:
+Default ports:
 
-- PostGIS: `5432`
-- Martin: `3000`
-- Web (Nginx): `8088`
+- PostGIS: 5432
+- Martin: 3000
+- Web (Nginx): 8088
 
 ## Prerequisites
 
 - Podman
-- Python 3.11+
-- Python package: `psycopg2-binary`
+- Python 3.10+
+- pip
 
-Optional but useful:
+Optional:
 
-- `psql` for SQL checks
-- `curl` for endpoint checks
+- psql (for DB verification)
+- curl (for endpoint checks)
 
-## Quick Start (Recommended)
+## Quick Start
 
 ### 1. Configure environment
 
-Create `.env` from `.env.sample` and set values:
+Create .env from .env.sample:
+
+```bash
+cp .env.sample .env
+```
+
+Example .env values:
 
 ```env
 POSTGRES_DB=kenda_cases
@@ -81,67 +82,31 @@ POSTGRES_PASSWORD=postgres
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/kenda_cases
 ```
 
-### 2. Start all services
+### 2. Install Python dependency
 
 ```bash
-set -a
-source .env
-set +a
+python3 -m pip install -r requirements.txt
+```
+
+### 3. Start the full stack
+
+```bash
 ./start.sh
 ```
 
-What `start.sh` does:
+What start.sh does:
 
-- Builds the PostGIS, Martin, and Nginx images
-- Starts containers with expected ports and environment variables
-- Runs `load_data.py` after PostGIS starts
+- builds PostGIS, Martin, and Nginx images
+- starts containers and maps service ports
+- runs load_data.py to populate the crimes table
 
-### 3. Open the map
+### 4. Open the demo
 
-- http://localhost:8088
+http://localhost:8088
 
-## Manual Podman Run (Step-by-Step)
+## Verify Services
 
-If you want to demo each component separately:
-
-### Build images
-
-```bash
-podman build -f containers/postgis/Containerfile -t demo/postgis:latest ./containers/postgis
-podman build -f containers/martin/Containerfile -t demo/martin:latest ./containers/martin
-podman build -f containers/nginx/Containerfile -t demo/nginx:latest ./containers/nginx
-```
-
-### Run PostGIS
-
-```bash
-podman run -d --name demo-postgis --env-file .env -p 5432:5432 demo/postgis:latest
-```
-
-### Load data
-
-```bash
-python3 -m pip install psycopg2-binary
-./load_data.py
-```
-
-### Run Martin
-
-```bash
-podman run -d --name demo-martin --env-file .env --network host -p 3000:3000 demo/martin:latest
-```
-
-### Run Nginx frontend
-
-```bash
-podman run -d --name demo-nginx -p 8088:80 \
-  -v "$PWD":/usr/share/nginx/html:ro \
-  demo/nginx:latest
-```
-
-## Validate the Demo
-
-### Martin endpoints
+Check Martin:
 
 ```bash
 curl http://localhost:3000/health
@@ -149,53 +114,88 @@ curl http://localhost:3000/catalog
 curl http://localhost:3000/crimes
 ```
 
-### PostGIS check
+Check table row count:
 
 ```bash
-psql -h localhost -U postgres -d kenda_cases -c "
-  SELECT id, title, year, ST_AsText(geom)
-  FROM crimes
-  ORDER BY id
-  LIMIT 5;
-"
+psql -h localhost -U postgres -d kenda_cases -c "SELECT COUNT(*) FROM crimes;"
 ```
 
-## Presentation Talking Points
+## Manual Run (Without start.sh)
 
-- Why open-source mapping: no proprietary lock-in, no API-key dependency for core rendering
-- Separation of concerns:
-  - PostGIS for spatial storage/indexing
-  - Martin for fast vector tile delivery
-  - MapLibre GL JS for browser rendering and interactivity
-- Real-world UX features in a small demo:
-  - Sidebar + filters + stats
-  - Feature popups
-  - Vector tile layer styling and labels
+Build images:
+
+```bash
+podman build -f containers/postgis/Containerfile -t open-source-mapping-presentation/postgis:latest ./containers/postgis
+podman build -f containers/martin/Containerfile -t open-source-mapping-presentation/martin:latest ./containers/martin
+podman build -f containers/nginx/Containerfile -t open-source-mapping-presentation/nginx:latest ./containers/nginx
+```
+
+Run PostGIS:
+
+```bash
+podman run -d --replace --name open-source-mapping-presentation-postgis \
+  --env-file .env \
+  -p 5432:5432 \
+  open-source-mapping-presentation/postgis:latest
+```
+
+Load data:
+
+```bash
+./load_data.py
+```
+
+Run Martin:
+
+```bash
+podman run -d --replace --name open-source-mapping-presentation-martin \
+  --env-file .env \
+  --network host \
+  -p 3000:3000 \
+  open-source-mapping-presentation/martin:latest
+```
+
+Run Nginx:
+
+```bash
+podman run -d --replace --name open-source-mapping-presentation-nginx \
+  -p 8088:80 \
+  -v "$PWD":/usr/share/nginx/html \
+  open-source-mapping-presentation/nginx:latest
+```
+
+## Known Operational Notes
+
+- start.sh currently uses an absolute host path for the Nginx volume mount. If your checkout path differs, edit that line or use the manual Nginx command above with $PWD.
+- start.sh removes prior containers using names that include :latest in the rm commands. Startup still works because each podman run uses --replace, but those rm lines can be cleaned up later.
+- The frontend references the OpenFreeMap dark style URL, so internet access is required for the base map style/tiles.
 
 ## Troubleshooting
 
-- Martin cannot connect:
-  - Confirm `DATABASE_URL` in `.env`
-  - Verify PostGIS container is running and listening on `5432`
-- Web app loads but no points:
-  - Check `http://localhost:3000/health`
-  - Confirm `crimes` table contains rows
-- Python loader fails:
-  - Install dependency: `python3 -m pip install psycopg2-binary`
-  - Ensure `.env` has valid DB credentials
+- Martin cannot connect to Postgres:
+  - verify DATABASE_URL in .env
+  - ensure PostGIS is running on 5432
+- Map loads, but no case points:
+  - verify Martin /health endpoint returns OK
+  - verify crimes table has rows
+- Sidebar appears, but map markers do not:
+  - the sidebar uses local crimes.json; the map still requires Martin tiles
+- load_data.py fails:
+  - install requirements: python3 -m pip install -r requirements.txt
+  - verify .env credentials and database name
 
 ## Tech Stack
 
 | Component | Purpose |
 | --- | --- |
 | PostgreSQL + PostGIS | Spatial data storage and indexing |
-| Martin | PostgreSQL/PostGIS to vector tiles |
-| MapLibre GL JS | Browser-based map rendering |
+| Martin | PostGIS to vector tiles |
+| MapLibre GL JS | Browser map rendering and interaction |
 | Nginx | Static frontend serving |
-| Python + psycopg2 | Dataset ingest pipeline |
+| Python + psycopg2 | Dataset ingest |
 
-## Data and Ethics Notes
+## Data Notes
 
 - Locations are approximate and intended for educational visualization.
-- Case information is presented for technical demonstration purposes.
-- This project is a local meetup demo, not a forensic or legal data system.
+- Case details are included for technical demonstration only.
+- This is a local demo project, not a forensic or legal data system.
