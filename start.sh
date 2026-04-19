@@ -5,15 +5,12 @@ set -e
 # Stop and remove existing containers if they exist
 echo "Stopping existing PostGIS container..."
 podman stop open-source-mapping-presentation-postgis || true # Ignore error if container doesn't exist
-podman rm -f open-source-mapping-presentation-postgis:latest
 
 echo "Stopping existing Martin container..."
 podman stop open-source-mapping-presentation-martin || true # Ignore error if container doesn't exist
-podman rm -f open-source-mapping-presentation-martin:latest
 
 echo "Stopping existing Nginx container..."
 podman stop open-source-mapping-presentation-nginx || true # Ignore error if container doesn't exist
-podman rm -f open-source-mapping-presentation-nginx:latest
 
 # Build and run PostGIS container
 echo "Starting PostGIS podman container..."
