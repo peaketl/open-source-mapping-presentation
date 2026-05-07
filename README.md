@@ -169,6 +169,72 @@ podman run -d --replace --name open-source-mapping-presentation-nginx \
 - `start.sh` currently uses an absolute host path for the Nginx volume mount. If your checkout path differs, edit that line or use the manual Nginx command above with `$PWD`.
 - The frontend references the OpenFreeMap dark style URL, so internet access is required for the base map style/tiles.
 
+## QGIS Integration
+
+QGIS can consume every layer in this stack while the containers are running.
+
+### PostGIS Connection (read/write)
+
+**Layer menu → Add Layer → Add PostGIS Layers**
+
+| Setting | Value |
+|---|---|
+| Host | `localhost` |
+| Port | `5432` |
+| Database | `kenda_cases` |
+| Username / Password | from `.env` |
+
+QGIS auto-discovers the `crimes` table and its `geom` column (Point, SRID 4326).
+
+### Base Map — XYZ Tile Layer
+
+1. In the **Browser panel**, expand **XYZ Tiles**.
+2. Right-click **XYZ Tiles → New Connection…**
+3. Fill in the dialog:
+
+| Setting | Value |
+|---|---|
+| Name | `OpenStreetMap` |
+| URL | `https://tile.openstreetmap.org/{z}/{x}/{y}.png` |
+| Min. Zoom Level | `0` |
+| Max. Zoom Level | `19` |
+
+4. Click **OK**, then double-click the new entry to add it to the map canvas.
+5. Drag it to the **bottom** of the Layers panel so crime points render on top.
+
+> **Tip:** Install the **QuickMapServices** plugin (`Plugins → Manage and Install Plugins`) for one-click access to OSM, Google, Esri, CARTO, and Stamen base maps.
+
+### Martin Vector Tiles (read-only)
+
+1. **Layer menu → Add Layer → Add Vector Tile Layer…**
+2. Click **New** next to the connection dropdown.
+3. Fill in the dialog:
+
+| Setting | Value |
+|---|---|
+| Name | `Martin – crimes` |
+| URL | `http://localhost:3000/crimes/{z}/{x}/{y}` |
+| Min. Zoom | `0` |
+| Max. Zoom | `22` |
+
+4. Click **OK → Add**.
+
+Confirm the tile source is reachable before connecting: `curl http://localhost:3000/crimes`
+
+Every table Martin auto-publishes follows the same pattern: `http://localhost:3000/{table_name}/{z}/{x}/{y}`.
+
+### One-time Export with `ogr2ogr`
+
+```bash
+ogr2ogr -f GPKG crimes_export.gpkg \
+  "postgresql://postgres:postgres@localhost:5432/kenda_cases" \
+  -sql "SELECT * FROM crimes"
+```
+
+Open `crimes_export.gpkg` directly in QGIS — no live connection needed.
+
+---
+
 ## Troubleshooting
 
 - Martin cannot connect to Postgres:
