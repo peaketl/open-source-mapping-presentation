@@ -27,7 +27,7 @@ echo "Running load_data.py script..."
 # Build and run Martin container
 echo "Starting Martin podman container..."
 podman build --no-cache --pull -f containers/martin/Containerfile -t open-source-mapping-presentation/martin:latest ./containers/martin
-podman run -d --replace --name open-source-mapping-presentation-martin --env-file ".env" --network host -p 3000:3000 open-source-mapping-presentation/martin:latest
+podman run -d --replace --name open-source-mapping-presentation-martin --env-file ".env" -p 3000:3000 open-source-mapping-presentation/martin:latest
 
 # Build and run the Nginx container
 echo "Starting Nginx podman container..."
@@ -35,3 +35,6 @@ podman build --no-cache --pull -f containers/nginx/Containerfile -t open-source-
 podman run -d --replace --name open-source-mapping-presentation-nginx -p 8088:80 -v /home/jason/src/peak-etl/open-source-mapping-presentation:/usr/share/nginx/html open-source-mapping-presentation/nginx:latest
 
 echo "All services started successfully!"
+echo "PostGIS: http://localhost:5432"
+echo "Martin: http://localhost:3000"
+echo "Nginx: http://localhost:8088"
