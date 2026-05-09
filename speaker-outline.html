@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Speaker Outline — Open-Source Mapping Stack</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #111;
+    background: #fff;
+    padding: 18mm 20mm 16mm;
+    max-width: 216mm;
+    margin: 0 auto;
+  }
+
+  /* ── Document header ── */
+  .doc-header {
+    border-bottom: 3px double #111;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+  }
+  .doc-header h1 {
+    font-size: 16pt;
+    font-weight: bold;
+    letter-spacing: -0.3px;
+  }
+  .doc-header .meta {
+    font-size: 9pt;
+    color: #555;
+    margin-top: 3px;
+    font-family: Arial, sans-serif;
+  }
+
+  /* ── Slide block ── */
+  .slide {
+    margin-bottom: 18px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Slide label row */
+  .slide-label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .slide-num {
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #fff;
+    background: #111;
+    padding: 1px 5px;
+    border-radius: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .slide-title {
+    font-size: 12.5pt;
+    font-weight: bold;
+    border-bottom: 1.5px solid #ccc;
+    flex: 1;
+    padding-bottom: 2px;
+  }
+  .slide-time {
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    color: #888;
+    white-space: nowrap;
+  }
+
+  /* Talking points */
+  .points {
+    padding-left: 22px;
+    margin-top: 4px;
+  }
+  .points li {
+    margin-bottom: 3px;
+  }
+  .points li::marker {
+    color: #888;
+  }
+
+  /* Sub-points */
+  .points ul {
+    list-style: circle;
+    padding-left: 20px;
+    margin-top: 2px;
+  }
+  .points ul li {
+    font-size: 10pt;
+    color: #333;
+    margin-bottom: 1px;
+  }
+
+  /* Cue / transition note */
+  .cue {
+    font-family: Arial, sans-serif;
+    font-size: 8.5pt;
+    color: #666;
+    font-style: italic;
+    padding-left: 22px;
+    margin-top: 4px;
+  }
+  .cue::before { content: "→ "; font-style: normal; }
+
+  /* Demo marker */
+  .demo {
+    display: inline-block;
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #fff;
+    background: #444;
+    padding: 0 5px;
+    border-radius: 2px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+  }
+
+  /* Section divider */
+  .section-break {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 8.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    padding: 3px 0;
+    margin: 14px 0 14px;
+  }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid #ccc;
+    margin-top: 20px;
+    padding-top: 5px;
+    font-family: Arial, sans-serif;
+    font-size: 8pt;
+    color: #999;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media print {
+    @page { size: letter portrait; margin: 14mm 18mm 12mm; }
+    body { padding: 0; font-size: 10.5pt; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .slide { break-inside: avoid; page-break-inside: avoid; }
+    a { color: #111 !important; text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <h1>PostGIS + Martin: Building Open-Source Mapping Applications</h1>
+  <div class="meta">Speaker Outline &nbsp;·&nbsp; Jason Holden, Peak ETL &nbsp;·&nbsp; jason@peaketl.com &nbsp;·&nbsp; (719) 310-5240</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ OPENING -->
+<div class="section-break">Opening</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">1</span>
+    <span class="slide-title">Title</span>
+  </div>
+  <ul class="points">
+    <li>Introduce yourself — Jason Holden, CEO of Peak ETL</li>
+    <li>Welcome everyone, thank the organizers</li>
+    <li>One-sentence hook: "Everything we build today is free and runs on your laptop"</li>
+  </ul>
+  <p class="cue">Advance to About Me</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">2</span>
+    <span class="slide-title">About Me</span>
+  </div>
+  <ul class="points">
+    <li>Started coding at 13 in eastern Oklahoma — known as the "computer kid"</li>
+    <li>First job out of high school: Visual FoxPro development</li>
+    <li>Decades of database app and service work since then</li>
+    <li>Now: Peak ETL — aggregating and analyzing public oil &amp; gas data for industry professionals</li>
+    <li>Today's talk is a direct outgrowth of the mapping work we do at Peak</li>
+  </ul>
+  <p class="cue">Advance to What We're Building</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ OVERVIEW -->
+<div class="section-break">Overview</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">3</span>
+    <span class="slide-title">What We're Building</span>
+  </div>
+  <ul class="points">
+    <li>Walk the pipeline left to right: JSON → Python → PostGIS → Martin → MapLibre</li>
+    <li>Three key selling points worth calling out:
+      <ul>
+        <li><strong>Podman:</strong> entire stack starts from one CLI command</li>
+        <li><strong>Vector tiles (MVT):</strong> binary, fast at every zoom level — no re-rendering on the server</li>
+        <li><strong>Zero cost / no API keys:</strong> everything is open-source; basemap from OpenFreeMap</li>
+      </ul>
+    </li>
+    <li>Ask if anyone has used PostGIS or MapLibre before — calibrate depth</li>
+  </ul>
+  <p class="cue">Advance to About this dataset</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">4</span>
+    <span class="slide-title">About this Dataset — Lt. Joe Kenda</span>
+  </div>
+  <ul class="points">
+    <li>Dataset is a stand-in — the real point is the stack, not the crimes</li>
+    <li>Kenda: Colorado Springs homicide detective, 1977&mdash;1996</li>
+    <li>387 cases, 356 closed — 92% clearance rate (national avg ~60%)</li>
+    <li>Retired as Commander, Major Crimes Unit; became the subject of Homicide Hunter (ID Network, 9 seasons)</li>
+    <li>Why this dataset? Geo-tagged, date-stamped, good variety — makes for a vivid demo</li>
+  </ul>
+  <p class="cue">Advance to PostGIS Concepts</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ DEEP DIVES -->
+<div class="section-break">Technical Deep Dives</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">5</span>
+    <span class="slide-title">PostGIS Concepts</span>
+  </div>
+  <ul class="points">
+    <li><strong>What PostGIS is:</strong> a PostgreSQL extension that adds geometry types and spatial functions</li>
+    <li><strong>Geometry types</strong> — keep it brief:
+      <ul>
+        <li>POINT — single location (what we use)</li>
+        <li>LINESTRING — roads, pipelines</li>
+        <li>POLYGON — neighborhoods, parcels</li>
+      </ul>
+    </li>
+    <li><strong>SRID / Coordinate systems:</strong>
+      <ul>
+        <li>SRID = Spatial Reference ID — a numeric code that tells PostGIS <em>which coordinate system</em> your data is in</li>
+        <li>4326 = WGS 84, the system GPS uses — latitude and longitude in decimal degrees; this is what your phone gives you and what we store</li>
+        <li>3857 = Web Mercator — a flat/projected system used by web maps; Martin and MapLibre handle the conversion automatically</li>
+        <li><em>Note: coordinate systems are a deep topic on their own — geodesy, datums, projections. For today, the rule is simple: store in 4326, let the stack reproject for display.</em></li>
+      </ul>
+    </li>
+    <li><strong>Spatial index:</strong> GiST index on <code>geom</code> — required for tile performance; without it tiles get slow at scale</li>
+    <li><strong>Key functions on the slide:</strong> <code>ST_MakePoint</code>, <code>ST_SetSRID</code>, <code>ST_GeomFromEWKT</code>, <code>ST_Distance</code>
+      <ul>
+        <li>Note: always pass (lon, lat) order — x before y, just like a graph</li>
+      </ul>
+    </li>
+  </ul>
+  <p class="cue">Advance to Martin Concepts</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">6</span>
+    <span class="slide-title">Martin Concepts</span>
+  </div>
+  <ul class="points">
+    <li><strong>What Martin is:</strong> open-source Rust tile server — points at PostGIS, serves MVT tiles automatically</li>
+    <li><strong>Vector tiles (MVT):</strong>
+      <ul>
+        <li>Binary and compressed — much smaller than GeoJSON over the wire</li>
+        <li>Tile URL scheme: <code>/{z}/{x}/{y}</code> — zoom, column, row</li>
+        <li>Browser renders with WebGL; styling is 100% client-side</li>
+        <li>Tiles are cacheable by a CDN — scales cheaply</li>
+      </ul>
+    </li>
+    <li><strong>Martin endpoints:</strong>
+      <ul>
+        <li><code>/crimes</code> — TileJSON metadata</li>
+        <li><code>/crimes/{z}/{x}/{y}</code> — actual tile</li>
+        <li><code>/catalog</code> — all published sources</li>
+        <li><code>/health</code> — health check</li>
+      </ul>
+    </li>
+    <li><strong>Config (martin.yaml):</strong> four lines — connection string + auto_publish → done; no table registration needed</li>
+  </ul>
+  <p class="cue">Advance to MapLibre GL JS</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">7</span>
+    <span class="slide-title">MapLibre GL JS Concepts</span>
+  </div>
+  <ul class="points">
+    <li><strong>History:</strong> fork of Mapbox GL JS after Mapbox went proprietary in 2020; backed by AWS, Microsoft, Meta</li>
+    <li><strong>How it works:</strong>
+      <ul>
+        <li>WebGL rendering — GPU-accelerated, smooth at 60fps</li>
+        <li>Consumes vector tiles directly from Martin</li>
+        <li>Style spec is JSON — layers, colors, filters all defined in code</li>
+      </ul>
+    </li>
+    <li><strong>In our app (app.js):</strong>
+      <ul>
+        <li>Basemap from OpenFreeMap — dark style, no API key</li>
+        <li>Two circle layers: halo + dot, colored by <code>solved</code> boolean</li>
+        <li>Sidebar + stats populated from local <code>crimes.json</code></li>
+        <li>Click popup shows title, victim, year, weapon, description</li>
+      </ul>
+    </li>
+    <li>Vanilla JS — no build step, no framework</li>
+  </ul>
+  <p class="cue">Advance to Stack Configuration</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ WALKTHROUGH -->
+<div class="section-break">Code Walkthrough</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">8</span>
+    <span class="slide-title">Stack Configuration <span class="demo">DEMO</span></span>
+  </div>
+  <ul class="points">
+    <li>Show <code>start.sh</code> — everything in one script:
+      <ul>
+        <li>Stop + remove old containers</li>
+        <li>Build fresh images (PostGIS, Martin, Nginx)</li>
+        <li>Start PostGIS, wait for it to be ready</li>
+        <li>Run <code>load_data.py</code> to seed data</li>
+        <li>Start Martin, then Nginx</li>
+      </ul>
+    </li>
+    <li>Briefly show the three Containerfiles — each is 3&mdash;5 lines</li>
+    <li>Point: no Docker Compose, no Kubernetes — just Podman CLI; easy to understand and debug</li>
+    <li><strong>Podman + systemd:</strong>
+      <ul>
+        <li>In dev, we start everything from the CLI — that's what <code>start.sh</code> does</li>
+        <li>In production, Podman integrates with systemd: <code>podman generate systemd</code> produces unit files that auto-start containers on boot — no orchestrator needed</li>
+        <li>We haven't needed Kubernetes — the workloads we run don't require that level of horizontal scaling, and avoiding it keeps operations simple</li>
+        <li>Podman is also daemonless and rootless by default — better security posture than Docker</li>
+      </ul>
+    </li>
+  </ul>
+  <p class="cue">Advance to Dataset Configuration</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">9</span>
+    <span class="slide-title">Dataset Configuration — crimes.json</span>
+  </div>
+  <ul class="points">
+    <li>Flat JSON array of case objects — no database required to edit or share</li>
+    <li>Each record has: id, episode, victim, year, crime_type, weapon, solved, lat, lon</li>
+    <li>Advantages: version-controlled, readable, easy to hand off to non-developers</li>
+    <li>Call out the lat/lon comment on the slide — lat = y, lon = x; easy to get backwards</li>
+  </ul>
+  <p class="cue">Advance to Database Schema</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">10</span>
+    <span class="slide-title">Database Schema</span>
+  </div>
+  <ul class="points">
+    <li>Schema lives in <code>containers/postgis/schema.sql</code> — auto-run on container first start</li>
+    <li>Most columns are plain text/int — same as any app table</li>
+    <li><strong>The magic column:</strong> <code>geom GEOMETRY(Point, 4326)</code> — this is what Martin reads</li>
+    <li><strong>Three indexes:</strong>
+      <ul>
+        <li>GiST on <code>geom</code> — spatial lookup for tile generation</li>
+        <li>B-tree on <code>year</code> and <code>season</code> — for sidebar filter queries</li>
+      </ul>
+    </li>
+    <li>If you forget the GiST index, tile generation does a full table scan — painfully obvious at scale</li>
+  </ul>
+  <p class="cue">Advance to PostGIS Queries</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">11</span>
+    <span class="slide-title">Raw PostGIS Queries <span class="demo">DEMO</span></span>
+  </div>
+  <ul class="points">
+    <li>Open <code>queries.sql</code> in one terminal and a <code>psql $DATABASE_URL</code> shell in another</li>
+    <li><strong>Query 1 — sanity check:</strong> <code>count(*)</code> split by <code>solved</code> — confirms the loader ran; reminds the audience this is ordinary SQL</li>
+    <li><strong>Query 2 — ST_AsText:</strong> show what the <code>geom</code> column actually contains in human-readable WKT (Well-Known Text); dispels the mystery of the binary column</li>
+    <li><strong>Query 3 — ST_AsGeoJSON:</strong> one function turns a row into a GeoJSON geometry object — same format the browser consumes</li>
+    <li><strong>Query 4 — ST_DWithin (radius search):</strong>
+      <ul>
+        <li>Cast <code>geom</code> to <code>::geography</code> — PostGIS switches from degrees to meters automatically</li>
+        <li>1,609 metres = 1 mile — no manual projection math required</li>
+        <li>This is the core spatial query behind any "find nearby" feature</li>
+      </ul>
+    </li>
+    <li><strong>Query 5 — KNN with &lt;-&gt; operator:</strong>
+      <ul>
+        <li>The <code>&lt;-&gt;</code> distance operator is index-accelerated — it uses the GiST index, fast even at scale</li>
+        <li>Pattern: <code>ORDER BY geom::geography &lt;-&gt; point::geography LIMIT N</code></li>
+      </ul>
+    </li>
+    <li><strong>Query 6 — aggregate by decade:</strong> clearance-rate calculation; PostGIS integrates seamlessly with normal SQL GROUP BY — no special treatment needed</li>
+    <li><strong>Query 7 — ST_Buffer + ST_Within:</strong> build a circle polygon, count points inside — foundation of zone-of-interest analysis; change the radius to taste</li>
+    <li><strong>Query 8 — ST_Centroid / ST_Collect:</strong> geographic center of all cases — one line; paste the result into Google Maps to verify it lands in Colorado Springs</li>
+  </ul>
+  <p class="cue">Advance to Data Loader</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">12</span>
+    <span class="slide-title">Data Loader — load_data.py <span class="demo">DEMO</span></span>
+  </div>
+  <ul class="points">
+    <li>~60 lines of Python — reads JSON, bulk inserts with <code>execute_values</code></li>
+    <li><code>DATABASE_URL</code> from environment — no hardcoded credentials</li>
+    <li><code>ST_SetSRID(ST_MakePoint(lon, lat), 4326)</code> inline in the INSERT — geometry built on the fly</li>
+    <li><code>ON CONFLICT DO NOTHING</code> — idempotent; safe to re-run after adding cases</li>
+    <li>Only dependency: <code>psycopg2-binary</code></li>
+  </ul>
+  <p class="cue">Advance to QGIS</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">13</span>
+    <span class="slide-title">QGIS — Open-Source Desktop GIS <span class="demo">DEMO</span></span>
+  </div>
+  <ul class="points">
+    <li>Connect directly to PostGIS: host <code>localhost</code>, port <code>5432</code>, DB <code>kenda_cases</code></li>
+    <li><strong>Debugging:</strong> visually confirm every point landed where you expect; spot coordinate-flip errors instantly</li>
+    <li><strong>Data quality:</strong> run spatial queries (e.g., "which cases fall outside city limits?"); overlay boundary layers</li>
+    <li><strong>Styling prototyping:</strong> experiment with symbology before translating to MapLibre JSON style</li>
+    <li>QGIS is free, runs on Windows/Mac/Linux — worth installing if you're doing any GIS work</li>
+  </ul>
+  <p class="cue">Advance to Key Take Aways</p>
+</div>
+
+<!-- ═══════════════════════════════════════════════ WRAP UP -->
+<div class="section-break">Wrap Up</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">14</span>
+    <span class="slide-title">Key Take Aways — Going Further</span>
+  </div>
+  <ul class="points">
+    <li><strong>PostGIS extensions to explore:</strong>
+      <ul>
+        <li><code>ST_Buffer</code> — draw a radius around any point</li>
+        <li><code>ST_ClusterKMeans</code> — cluster points into groups for heatmaps</li>
+        <li><code>ST_Hexagon</code> — hexbin aggregation</li>
+        <li>Raster support — elevation, imagery</li>
+        <li>Book: <em>PostGIS In Action</em> (Manning Press)</li>
+        <li><code>pg_bouncer</code> for connection pooling in production</li>
+      </ul>
+    </li>
+    <li><strong>Martin:</strong> SQL functions as tile sources; MbTiles (offline); sprite/glyph config; CDN caching</li>
+    <li><strong>MapLibre:</strong> GeoJSON sources for live data; heatmap layers; 3D terrain/extrusions; Deck.gl integration</li>
+    <li><strong>QGIS:</strong> qgis.org — free download</li>
+    <li>Reinforce the zero-cost message — this entire stack in production costs $0 in licensing</li>
+  </ul>
+  <p class="cue">Advance to Contact / Q&amp;A</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">15</span>
+    <span class="slide-title">Contact &amp; Q&amp;A</span>
+  </div>
+  <ul class="points">
+    <li>GitHub repo is public — everything shown today is in it:
+      <ul>
+        <li>github.com/peaketl/open-source-mapping-presentation</li>
+      </ul>
+    </li>
+    <li>Contact:
+      <ul>
+        <li>jason@peaketl.com</li>
+        <li>(719) 310-5240 &nbsp;|&nbsp; (918) 409-CODE (2633)</li>
+        <li>www.peaketl.com</li>
+      </ul>
+    </li>
+    <li>Open for questions — if the demo is still running, offer to walk through any section live</li>
+    <li>Thank the organizers and attendees</li>
+  </ul>
+</div>
+
+<footer>
+  <span>Jason Holden · Peak ETL · jason@peaketl.com</span>
+  <span>Open-Source Mapping Stack · Speaker Outline · May 2026</span>
+</footer>
+
+</body>
+</html>
