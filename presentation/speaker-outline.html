@@ -267,44 +267,18 @@
         <li>Note: always pass (lon, lat) order — x before y, just like a graph</li>
       </ul>
     </li>
-  </ul>
-  <p class="cue">Advance to PostGIS Queries</p>
-</div>
-
-<div class="slide">
-  <div class="slide-label">
-    <span class="slide-num">6</span>
-    <span class="slide-title">Raw PostGIS Queries <span class="demo">DEMO</span></span>
-  </div>
-  <ul class="points">
-    <li>Open <code>queries.sql</code> in one terminal and a <code>psql $DATABASE_URL</code> shell in another</li>
-    <li>Tell the audience to <strong>flip their handout over</strong> — the eight queries are printed on the back; they can follow along or run them later</li>
-    <li><strong>Query 1 — sanity check:</strong> <code>count(*)</code> split by <code>solved</code> — confirms the loader ran; reminds the audience this is ordinary SQL</li>
-    <li><strong>Query 2 — ST_AsText:</strong> show what the <code>geom</code> column actually contains in human-readable WKT (Well-Known Text); dispels the mystery of the binary column</li>
-    <li><strong>Query 3 — ST_AsGeoJSON:</strong> one function turns a row into a GeoJSON geometry object — same format the browser consumes</li>
-    <li><strong>Query 4 — ST_DWithin (radius search):</strong>
+    <li><strong>Live demo opportunity:</strong> open <code>queries.sql</code> and a <code>psql $DATABASE_URL</code> shell; the eight reference queries are on the back of the handout — attendees can follow along or run them later
       <ul>
-        <li>Cast <code>geom</code> to <code>::geography</code> — PostGIS switches from degrees to meters automatically</li>
-        <li>1,609 metres = 1 mile — no manual projection math required</li>
-        <li>This is the core spatial query behind any "find nearby" feature</li>
+        <li>Sanity check: <code>count(*)</code> by <code>solved</code>; ST_AsText / ST_AsGeoJSON to demystify the binary column; ST_DWithin for radius search; KNN <code>&lt;-&gt;</code> operator; decade aggregation; ST_Buffer zone; ST_Centroid of all crimes</li>
       </ul>
     </li>
-    <li><strong>Query 5 — KNN with &lt;-&gt; operator:</strong>
-      <ul>
-        <li>The <code>&lt;-&gt;</code> distance operator is index-accelerated — it uses the GiST index, fast even at scale</li>
-        <li>Pattern: <code>ORDER BY geom::geography &lt;-&gt; point::geography LIMIT N</code></li>
-      </ul>
-    </li>
-    <li><strong>Query 6 — aggregate by decade:</strong> clearance-rate calculation; PostGIS integrates seamlessly with normal SQL GROUP BY — no special treatment needed</li>
-    <li><strong>Query 7 — ST_Buffer + ST_Within:</strong> build a circle polygon, count points inside — foundation of zone-of-interest analysis; change the radius to taste</li>
-    <li><strong>Query 8 — ST_Centroid / ST_Collect:</strong> geographic center of all cases — one line; paste the result into Google Maps to verify it lands in Colorado Springs</li>
   </ul>
   <p class="cue">Advance to Martin Concepts</p>
 </div>
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">7</span>
+    <span class="slide-num">6</span>
     <span class="slide-title">Martin Concepts</span>
   </div>
   <ul class="points">
@@ -332,7 +306,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">8</span>
+    <span class="slide-num">7</span>
     <span class="slide-title">MapLibre GL JS Concepts</span>
   </div>
   <ul class="points">
@@ -357,41 +331,9 @@
   <p class="cue">Advance to Stack Configuration</p>
 </div>
 
-<!-- ═══════════════════════════════════════════════ WALKTHROUGH -->
-<div class="section-break">Code Walkthrough</div>
-
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">9</span>
-    <span class="slide-title">Stack Configuration <span class="demo">DEMO</span></span>
-  </div>
-  <ul class="points">
-    <li>Show <code>start.sh</code> — everything in one script:
-      <ul>
-        <li>Stop + remove old containers</li>
-        <li>Build fresh images (PostGIS, Martin, Nginx)</li>
-        <li>Start PostGIS, wait for it to be ready</li>
-        <li>Run <code>load_data.py</code> to seed data</li>
-        <li>Start Martin, then Nginx</li>
-      </ul>
-    </li>
-    <li>Briefly show the three Containerfiles — each is 3&mdash;5 lines</li>
-    <li>Point: no Docker Compose, no Kubernetes — just Podman CLI; easy to understand and debug</li>
-    <li><strong>Podman + systemd:</strong>
-      <ul>
-        <li>In dev, we start everything from the CLI — that's what <code>start.sh</code> does</li>
-        <li>In production, Podman integrates with systemd: <code>podman generate systemd</code> produces unit files that auto-start containers on boot — no orchestrator needed</li>
-        <li>We haven't needed Kubernetes — the workloads we run don't require that level of horizontal scaling, and avoiding it keeps operations simple</li>
-        <li>Podman is also daemonless and rootless by default — better security posture than Docker</li>
-      </ul>
-    </li>
-  </ul>
-  <p class="cue">Advance to Dataset Configuration</p>
-</div>
-
-<div class="slide">
-  <div class="slide-label">
-    <span class="slide-num">10</span>
+    <span class="slide-num">8</span>
     <span class="slide-title">Dataset Configuration — crimes.json</span>
   </div>
   <ul class="points">
@@ -405,7 +347,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">11</span>
+    <span class="slide-num">9</span>
     <span class="slide-title">Database Schema</span>
   </div>
   <ul class="points">
@@ -425,7 +367,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">12</span>
+    <span class="slide-num">10</span>
     <span class="slide-title">Data Loader — load_data.py <span class="demo">DEMO</span></span>
   </div>
   <ul class="points">
@@ -435,12 +377,42 @@
     <li><code>ON CONFLICT DO NOTHING</code> — idempotent; safe to re-run after adding cases</li>
     <li>Only dependency: <code>psycopg2-binary</code></li>
   </ul>
+  <p class="cue">Advance to The Code</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">11</span>
+    <span class="slide-title">The Code — Vanilla JS + HTML + CSS <span class="demo">DEMO</span></span>
+  </div>
+  <ul class="points">
+    <li>No build step, no framework — plain HTML + CSS + a single JS file; integrates with any stack</li>
+    <li><strong>index.html:</strong>
+      <ul>
+        <li>Loads MapLibre GL JS and its stylesheet from unpkg CDN — no API key, no npm install</li>
+        <li>Header badge, title, subtitle; sidebar + stats panel; map <code>&lt;div&gt;</code></li>
+        <li>One <code>&lt;script src="app.js"&gt;</code> at the end</li>
+      </ul>
+    </li>
+    <li><strong>app.js — configuration constants at the top (easy to adapt):</strong>
+      <ul>
+        <li><code>MARTIN_URL</code> — swap to point at any Martin instance</li>
+        <li><code>TABLE</code> — change to target a different PostGIS table</li>
+        <li><code>MAP_CENTER</code> / <code>MAP_ZOOM</code> — set starting view for any geography</li>
+        <li><code>BASEMAP_STYLE</code> — two styles commented in at the top: dark and classic (liberty); live-swap them to show how a single constant change flips the entire basemap</li>
+      </ul>
+    </li>
+    <li><strong>Basemap swap demo:</strong> uncomment the <code>liberty</code> URL, reload — same data, completely different look; reinforces that tiles and styling are decoupled</li>
+    <li><strong>Programmatic styling:</strong> circle layer colors, radii, and filters are all defined in JavaScript — change them at runtime without re-serving tiles</li>
+    <li>Sidebar and stats are populated from local <code>crimes.json</code> — in production swap for an API call</li>
+    <li>Completely customizable — the same pattern scales from a demo to a production web app</li>
+  </ul>
   <p class="cue">Advance to QGIS</p>
 </div>
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">13</span>
+    <span class="slide-num">12</span>
     <span class="slide-title">QGIS — Open-Source Desktop GIS <span class="demo">DEMO</span></span>
   </div>
   <ul class="points">
@@ -458,7 +430,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">14</span>
+    <span class="slide-num">13</span>
     <span class="slide-title">Key Take Aways — Going Further</span>
   </div>
   <ul class="points">
@@ -482,7 +454,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">15</span>
+    <span class="slide-num">14</span>
     <span class="slide-title">Contact &amp; Q&amp;A</span>
   </div>
   <ul class="points">

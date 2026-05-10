@@ -4,7 +4,10 @@ const MAP_CENTER  = [-104.8214, 38.8339];             // Colorado Springs
 const MAP_ZOOM    = 11;
 
 // Base map
+// Dark
 const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
+// Classic
+//const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
 // State
 let map;

@@ -151,15 +151,15 @@
   @media print {
     @page {
       size: letter portrait;
-      margin: 11mm 13mm 10mm;
+      margin: 8mm 10mm 7mm;
     }
 
     /* Let the @page margins do the work */
     body {
       padding: 0;
       max-width: none;
-      font-size: 8.5pt;
-      line-height: 1.35;
+      font-size: 7.5pt;
+      line-height: 1.25;
     }
 
     /* Preserve background colors (section badges, code blocks, table headers) */
@@ -178,19 +178,27 @@
     }
 
     /* Tighten vertical rhythm */
+    header { margin-bottom: 7px; }
+    header h1 { font-size: 11pt; }
+    .cols { gap: 0 12px; }
+    .arch { gap: 3px; margin-bottom: 6px; }
+    .arch-box { padding: 3px 5px; min-width: 60px; }
     h2 {
-      margin: 7px 0 4px;
+      margin: 5px 0 3px;
       break-after: avoid;
       page-break-after: avoid;
     }
     pre {
-      padding: 4px 6px;
-      margin-bottom: 4px;
+      padding: 3px 5px;
+      margin-bottom: 3px;
     }
-    dl { gap: 1px 8px; margin-bottom: 4px; }
-    table { margin-bottom: 4px; }
-    th, td { padding: 2px 5px; }
-    footer { margin-top: 8px; }
+    dl { gap: 1px 6px; margin-bottom: 3px; }
+    table { margin-bottom: 3px; }
+    th, td { padding: 2px 4px; }
+    footer { margin-top: 6px; padding-top: 3px; }
+    .note { padding: 3px 6px; margin-top: 4px; }
+    .note-inline { margin: -1px 0 3px; }
+    p[style] { margin-bottom: 3px !important; }
 
     /* Avoid breaking inside a section block — but NOT .cols, which must flow freely */
     pre, table, dl, .arch, .note {
@@ -246,7 +254,6 @@
     <pre>cp .env.sample .env
 python3 -m pip install -r requirements.txt
 ./start.sh</pre>
-    <p style="font-size:9pt;margin-bottom:6px"><code>start.sh</code> builds and starts all three containers, then runs <code>load_data.py</code> to seed PostGIS.</p>
 
     <h2>Environment (.env)</h2>
     <pre>POSTGRES_DB=kenda_cases
@@ -266,19 +273,10 @@ DATABASE_URL=postgresql://postgres:postgres\
     </table>
 
     <h2>Useful Commands</h2>
-    <pre># Inspect running containers
-podman ps
-
-# Open a psql shell
+    <pre>podman ps
 psql $DATABASE_URL
-
-# Count loaded cases
 psql $DATABASE_URL -c "SELECT count(*) FROM crimes;"
-
-# Check spatial index
 psql $DATABASE_URL -c "\d crimes"
-
-# Re-run loader after editing crimes.json
 python3 load_data.py</pre>
 
   </div>
@@ -306,8 +304,6 @@ ST_SetSRID(ST_MakePoint(lon, lat), 4326)</pre>
     tables: true
     from_schemas: public
 listen_addresses: "0.0.0.0:3000"</pre>
-    <p style="font-size:9pt;margin-bottom:6px">Martin auto-discovers and publishes every table in the <code>public</code> schema that has a geometry column — no additional config needed when you add a new table.</p>
-
     <h2>MapLibre GL JS (app.js)</h2>
     <dl>
       <dt>Basemap</dt>  <dd>OpenFreeMap dark style (no API key)</dd>
@@ -317,15 +313,19 @@ listen_addresses: "0.0.0.0:3000"</pre>
       <dt>Popups</dt>   <dd>On click: title, victim, year, weapon, description</dd>
     </dl>
 
+    <h2>Front-end Config (top of app.js)</h2>
+    <pre>const MARTIN_URL    = "http://localhost:3000"; // tile server
+const TABLE         = "crimes";               // PostGIS table
+const MAP_CENTER    = [-104.8214, 38.8339];   // [lon, lat]
+const MAP_ZOOM      = 11;
+const BASEMAP_STYLE =
+  "https://tiles.openfreemap.org/styles/dark";</pre>
     <h2>Container Images</h2>
     <dl>
       <dt>PostGIS</dt><dd><code>docker.io/postgis/postgis:18-3.6</code></dd>
       <dt>Martin</dt> <dd><code>ghcr.io/maplibre/martin:latest</code></dd>
       <dt>Nginx</dt>  <dd>standard nginx, serves <code>/usr/share/nginx/html</code></dd>
     </dl>
-
-    <h2>Key Dependencies (requirements.txt)</h2>
-    <pre>psycopg2-binary   # PostgreSQL adapter for Python</pre>
 
     <div class="note">
       <strong>Tip:</strong> Connect QGIS directly to PostGIS on <code>localhost:5432</code>
