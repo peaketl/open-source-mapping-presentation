@@ -115,6 +115,28 @@
     margin-top: 6px;
   }
 
+  /* ── Inline note (below a code block) ── */
+  .note-inline {
+    font-size: 8pt;
+    color: #666;
+    font-style: italic;
+    margin: -2px 0 6px;
+  }
+
+  /* ── Page 2 separator ── */
+  .page-break {
+    break-before: page;
+    page-break-before: always;
+    height: 0;
+  }
+  @media screen {
+    .page-break {
+      height: auto;
+      border-top: 2px dashed #ccc;
+      margin: 36px 0 28px;
+    }
+  }
+
   /* ── Footer ── */
   footer {
     border-top: 1px solid #ccc;
@@ -129,14 +151,15 @@
   @media print {
     @page {
       size: letter portrait;
-      margin: 13mm 14mm 11mm;
+      margin: 11mm 13mm 10mm;
     }
 
     /* Let the @page margins do the work */
     body {
       padding: 0;
       max-width: none;
-      font-size: 9.5pt;
+      font-size: 8.5pt;
+      line-height: 1.35;
     }
 
     /* Preserve background colors (section badges, code blocks, table headers) */
@@ -151,22 +174,34 @@
     }
     pre, code {
       font-family: 'Courier New', Courier, monospace;
+      font-size: 7.5pt;
     }
 
-    /* Avoid breaking inside a section block */
-    h2 { break-after: avoid; page-break-after: avoid; }
+    /* Tighten vertical rhythm */
+    h2 {
+      margin: 7px 0 4px;
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+    pre {
+      padding: 4px 6px;
+      margin-bottom: 4px;
+    }
+    dl { gap: 1px 8px; margin-bottom: 4px; }
+    table { margin-bottom: 4px; }
+    th, td { padding: 2px 5px; }
+    footer { margin-top: 8px; }
+
+    /* Avoid breaking inside a section block — but NOT .cols, which must flow freely */
     pre, table, dl, .arch, .note {
       break-inside: avoid;
       page-break-inside: avoid;
     }
 
-    /* Keep columns from orphaning */
-    .cols { break-inside: avoid; page-break-inside: avoid; }
-
     /* URLs: show raw href after link text */
     a[href]::after {
       content: " (" attr(href) ")";
-      font-size: 7.5pt;
+      font-size: 7pt;
       color: #555;
     }
     /* …except inline code links which are already readable */
@@ -300,21 +335,139 @@ listen_addresses: "0.0.0.0:3000"</pre>
   </div>
 </div>
 
-<!-- REFERENCES -->
-<div class="col-full">
-  <h2>References</h2>
-  <ul class="refs">
-    <li><span>PostGIS</span><a href="https://postgis.net/documentation/">postgis.net/documentation</a></li>
-    <li><span>Martin</span><a href="https://maplibre.org/martin/">maplibre.org/martin</a></li>
-    <li><span>MapLibre GL JS</span><a href="https://maplibre.org/maplibre-gl-js/docs/">maplibre.org/maplibre-gl-js/docs</a></li>
-    <li><span>OpenFreeMap</span><a href="https://openfreemap.org">openfreemap.org</a> — free basemap tiles, no API key required</li>
-    <li><span>Podman</span><a href="https://podman.io/docs">podman.io/docs</a></li>
-  </ul>
+<footer>
+  <span>github.com/peaketl/open-source-mapping-presentation</span>
+  <span>Open-Source Mapping Stack · Page 1 of 2 · May 2026</span>
+</footer>
+
+<!-- ═══════════════════════════════════════ PAGE 2 ═══════════════════════════════════════ -->
+<div class="page-break"></div>
+
+<header>
+  <h1>Open-Source Mapping Stack — PostGIS Queries</h1>
+  <span class="subtitle">queries.sql &nbsp;·&nbsp; connect: psql $DATABASE_URL</span>
+</header>
+
+<div class="cols">
+
+  <!-- LEFT: queries 1–4 -->
+  <div>
+
+    <h2>1 · Row counts</h2>
+    <pre>SELECT
+  count(*)                            AS total,
+  count(*) FILTER (WHERE solved)      AS solved,
+  count(*) FILTER (WHERE NOT solved)  AS unsolved
+FROM crimes;</pre>
+
+    <h2>2 · ST_AsText — see the geometry</h2>
+    <pre>SELECT title, ST_AsText(geom) AS wkt
+FROM crimes LIMIT 5;</pre>
+    <p class="note-inline">Converts the binary geom column to human-readable WKT coordinates.</p>
+
+    <h2>3 · ST_AsGeoJSON — export a row</h2>
+    <pre>SELECT title, ST_AsGeoJSON(geom) AS geojson
+FROM crimes WHERE id = 1;</pre>
+    <p class="note-inline">Same format MapLibre and most web APIs consume directly.</p>
+
+    <h2>4 · ST_DWithin — radius search</h2>
+    <pre>-- Crimes within 1 mile of downtown Colorado Springs
+SELECT title, year, solved
+FROM crimes
+WHERE ST_DWithin(
+  geom::geography,
+  ST_MakePoint(-104.8214, 38.8339)::geography,
+  1609            -- metres (1 mile)
+)
+ORDER BY year;</pre>
+    <p class="note-inline">::geography cast → PostGIS works in metres; no projection math needed.</p>
+
+  </div>
+
+  <!-- RIGHT: queries 5–8 -->
+  <div>
+
+    <h2>5 · KNN — nearest neighbours</h2>
+    <pre>SELECT title,
+  round(ST_Distance(
+    geom::geography,
+    ST_MakePoint(-104.8214, 38.8339)::geography
+  )::numeric) AS dist_m
+FROM crimes
+ORDER BY geom::geography
+  &lt;-> ST_MakePoint(-104.8214, 38.8339)::geography
+LIMIT 5;</pre>
+    <p class="note-inline">&lt;-> is the KNN distance operator — index-accelerated via GiST.</p>
+
+    <h2>6 · Aggregate by decade</h2>
+    <pre>SELECT (year/10*10)::text||'s' AS decade,
+  count(*) AS cases,
+  round(100.0
+    * count(*) FILTER (WHERE solved)
+    / count(*)) AS pct_solved
+FROM crimes
+GROUP BY decade ORDER BY decade;</pre>
+
+    <h2>7 · ST_Buffer — zone of interest</h2>
+    <pre>WITH zone AS (
+  SELECT ST_Buffer(
+    ST_MakePoint(-104.8214, 38.8339)::geography,
+    2000            -- metres (2 km radius)
+  )::geometry AS circle
+)
+SELECT count(*) AS crimes_within_2km
+FROM crimes, zone
+WHERE ST_Within(geom, zone.circle);</pre>
+
+    <h2>8 · ST_Centroid — geographic center</h2>
+    <pre>SELECT ST_AsText(
+  ST_Centroid(ST_Collect(geom))
+) AS center_of_all_crimes
+FROM crimes;</pre>
+    <p class="note-inline">ST_Collect aggregates all points; ST_Centroid finds their geographic center.</p>
+
+  </div>
+</div>
+
+<div class="cols" style="margin-top:6px">
+
+  <div>
+    <h2>Going Further — PostGIS</h2>
+    <ul class="refs" style="list-style:disc;padding-left:14px;font-size:9pt">
+      <li style="margin-bottom:2px"><code>ST_ClusterKMeans</code> — cluster points for heatmaps</li>
+      <li style="margin-bottom:2px"><code>ST_Hexagon</code> — hexbin aggregation</li>
+      <li style="margin-bottom:2px">Raster support — elevation, imagery</li>
+      <li style="margin-bottom:2px"><code>pgbouncer</code> — connection pooling in production</li>
+      <li style="margin-bottom:2px">Book: <em>PostGIS In Action</em> (Manning Press)</li>
+    </ul>
+    <h2 style="margin-top:10px">Going Further — Martin &amp; MapLibre</h2>
+    <ul class="refs" style="list-style:disc;padding-left:14px;font-size:9pt">
+      <li style="margin-bottom:2px">Martin: SQL functions as tile sources; MBTiles for offline; CDN caching</li>
+      <li style="margin-bottom:2px">MapLibre: heatmap layers; 3D terrain; Deck.gl integration; live GeoJSON sources</li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>References</h2>
+    <ul class="refs">
+      <li><span>PostGIS</span><a href="https://postgis.net/documentation/">postgis.net/documentation</a></li>
+      <li><span>Martin</span><a href="https://maplibre.org/martin/">maplibre.org/martin</a></li>
+      <li><span>MapLibre GL JS</span><a href="https://maplibre.org/maplibre-gl-js/docs/">maplibre.org/maplibre-gl-js/docs</a></li>
+      <li><span>OpenFreeMap</span><a href="https://openfreemap.org">openfreemap.org</a> — free basemap, no API key</li>
+      <li><span>QGIS</span><a href="https://qgis.org">qgis.org</a> — free desktop GIS</li>
+      <li><span>Podman</span><a href="https://podman.io/docs">podman.io/docs</a></li>
+    </ul>
+    <div class="note" style="margin-top:8px">
+      <strong>GitHub:</strong> github.com/peaketl/open-source-mapping-presentation<br>
+      <strong>Contact:</strong> jason@peaketl.com · (719) 310-5240 · www.peaketl.com
+    </div>
+  </div>
+
 </div>
 
 <footer>
-  <span>github.com/peaketl/open-source-mapping-presentation</span>
-  <span>Open-Source Mapping Stack · May 2026</span>
+  <span>Jason Holden · Peak ETL · jason@peaketl.com</span>
+  <span>Open-Source Mapping Stack · Page 2 of 2 · May 2026</span>
 </footer>
 
 </body>

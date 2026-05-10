@@ -179,6 +179,7 @@
     <li>Introduce yourself — Jason Holden, CEO of Peak ETL</li>
     <li>Welcome everyone, thank the organizers</li>
     <li>One-sentence hook: "Everything we build today is free and runs on your laptop"</li>
+    <li><strong>Distribute handouts now</strong> — two-sided: stack reference on the front, PostGIS demo queries on the back; they'll need the back during the live query demo</li>
   </ul>
   <p class="cue">Advance to About Me</p>
 </div>
@@ -267,12 +268,43 @@
       </ul>
     </li>
   </ul>
-  <p class="cue">Advance to Martin Concepts</p>
+  <p class="cue">Advance to PostGIS Queries</p>
 </div>
 
 <div class="slide">
   <div class="slide-label">
     <span class="slide-num">6</span>
+    <span class="slide-title">Raw PostGIS Queries <span class="demo">DEMO</span></span>
+  </div>
+  <ul class="points">
+    <li>Open <code>queries.sql</code> in one terminal and a <code>psql $DATABASE_URL</code> shell in another</li>
+    <li>Tell the audience to <strong>flip their handout over</strong> — the eight queries are printed on the back; they can follow along or run them later</li>
+    <li><strong>Query 1 — sanity check:</strong> <code>count(*)</code> split by <code>solved</code> — confirms the loader ran; reminds the audience this is ordinary SQL</li>
+    <li><strong>Query 2 — ST_AsText:</strong> show what the <code>geom</code> column actually contains in human-readable WKT (Well-Known Text); dispels the mystery of the binary column</li>
+    <li><strong>Query 3 — ST_AsGeoJSON:</strong> one function turns a row into a GeoJSON geometry object — same format the browser consumes</li>
+    <li><strong>Query 4 — ST_DWithin (radius search):</strong>
+      <ul>
+        <li>Cast <code>geom</code> to <code>::geography</code> — PostGIS switches from degrees to meters automatically</li>
+        <li>1,609 metres = 1 mile — no manual projection math required</li>
+        <li>This is the core spatial query behind any "find nearby" feature</li>
+      </ul>
+    </li>
+    <li><strong>Query 5 — KNN with &lt;-&gt; operator:</strong>
+      <ul>
+        <li>The <code>&lt;-&gt;</code> distance operator is index-accelerated — it uses the GiST index, fast even at scale</li>
+        <li>Pattern: <code>ORDER BY geom::geography &lt;-&gt; point::geography LIMIT N</code></li>
+      </ul>
+    </li>
+    <li><strong>Query 6 — aggregate by decade:</strong> clearance-rate calculation; PostGIS integrates seamlessly with normal SQL GROUP BY — no special treatment needed</li>
+    <li><strong>Query 7 — ST_Buffer + ST_Within:</strong> build a circle polygon, count points inside — foundation of zone-of-interest analysis; change the radius to taste</li>
+    <li><strong>Query 8 — ST_Centroid / ST_Collect:</strong> geographic center of all cases — one line; paste the result into Google Maps to verify it lands in Colorado Springs</li>
+  </ul>
+  <p class="cue">Advance to Martin Concepts</p>
+</div>
+
+<div class="slide">
+  <div class="slide-label">
+    <span class="slide-num">7</span>
     <span class="slide-title">Martin Concepts</span>
   </div>
   <ul class="points">
@@ -300,7 +332,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">7</span>
+    <span class="slide-num">8</span>
     <span class="slide-title">MapLibre GL JS Concepts</span>
   </div>
   <ul class="points">
@@ -330,7 +362,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">8</span>
+    <span class="slide-num">9</span>
     <span class="slide-title">Stack Configuration <span class="demo">DEMO</span></span>
   </div>
   <ul class="points">
@@ -359,7 +391,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">9</span>
+    <span class="slide-num">10</span>
     <span class="slide-title">Dataset Configuration — crimes.json</span>
   </div>
   <ul class="points">
@@ -373,7 +405,7 @@
 
 <div class="slide">
   <div class="slide-label">
-    <span class="slide-num">10</span>
+    <span class="slide-num">11</span>
     <span class="slide-title">Database Schema</span>
   </div>
   <ul class="points">
@@ -387,36 +419,6 @@
       </ul>
     </li>
     <li>If you forget the GiST index, tile generation does a full table scan — painfully obvious at scale</li>
-  </ul>
-  <p class="cue">Advance to PostGIS Queries</p>
-</div>
-
-<div class="slide">
-  <div class="slide-label">
-    <span class="slide-num">11</span>
-    <span class="slide-title">Raw PostGIS Queries <span class="demo">DEMO</span></span>
-  </div>
-  <ul class="points">
-    <li>Open <code>queries.sql</code> in one terminal and a <code>psql $DATABASE_URL</code> shell in another</li>
-    <li><strong>Query 1 — sanity check:</strong> <code>count(*)</code> split by <code>solved</code> — confirms the loader ran; reminds the audience this is ordinary SQL</li>
-    <li><strong>Query 2 — ST_AsText:</strong> show what the <code>geom</code> column actually contains in human-readable WKT (Well-Known Text); dispels the mystery of the binary column</li>
-    <li><strong>Query 3 — ST_AsGeoJSON:</strong> one function turns a row into a GeoJSON geometry object — same format the browser consumes</li>
-    <li><strong>Query 4 — ST_DWithin (radius search):</strong>
-      <ul>
-        <li>Cast <code>geom</code> to <code>::geography</code> — PostGIS switches from degrees to meters automatically</li>
-        <li>1,609 metres = 1 mile — no manual projection math required</li>
-        <li>This is the core spatial query behind any "find nearby" feature</li>
-      </ul>
-    </li>
-    <li><strong>Query 5 — KNN with &lt;-&gt; operator:</strong>
-      <ul>
-        <li>The <code>&lt;-&gt;</code> distance operator is index-accelerated — it uses the GiST index, fast even at scale</li>
-        <li>Pattern: <code>ORDER BY geom::geography &lt;-&gt; point::geography LIMIT N</code></li>
-      </ul>
-    </li>
-    <li><strong>Query 6 — aggregate by decade:</strong> clearance-rate calculation; PostGIS integrates seamlessly with normal SQL GROUP BY — no special treatment needed</li>
-    <li><strong>Query 7 — ST_Buffer + ST_Within:</strong> build a circle polygon, count points inside — foundation of zone-of-interest analysis; change the radius to taste</li>
-    <li><strong>Query 8 — ST_Centroid / ST_Collect:</strong> geographic center of all cases — one line; paste the result into Google Maps to verify it lands in Colorado Springs</li>
   </ul>
   <p class="cue">Advance to Data Loader</p>
 </div>
