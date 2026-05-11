@@ -146,7 +146,7 @@ function addCrimeLayer() {
 
 // Click handler — show popup
 function onCrimeClick(e) {
-    if (!e.features.length) return;
+    if (!e.features.length) return; // If you click on an empty spot, just bail out
 
     const f = e.features[0];
     const p = f.properties;
@@ -296,9 +296,9 @@ function applyFilters() {
 
 function buildMapFilter(season, solved, year) {
     const conditions = ["all", ["<=", ["get", "year"], year]];
-    if (season !== "all") conditions.push(["==", ["get", "season"], parseInt(season)]);
-    if (solved === "solved")   conditions.push(["==", ["get", "solved"], true]);
-    if (solved === "unsolved") conditions.push(["==", ["get", "solved"], false]);
+    if (season != "all") conditions.push(["==", ["get", "season"], parseInt(season)]);
+    if (solved == "solved") conditions.push(["==", ["get", "solved"], true]);
+    if (solved == "unsolved") conditions.push(["==", ["get", "solved"], false]);
     return conditions;
 }
 
@@ -306,6 +306,5 @@ function buildMapFilter(season, solved, year) {
 document.getElementById("filter-season").addEventListener("change", applyFilters);
 document.getElementById("filter-solved").addEventListener("change", applyFilters);
 document.getElementById("filter-year").addEventListener("input",  applyFilters);
-
 
 bootstrap();
