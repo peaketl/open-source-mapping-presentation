@@ -3,7 +3,7 @@ const TABLE       = "crimes";                         // PostGIS table name
 const MAP_CENTER  = [-104.8214, 38.8339];             // Colorado Springs
 const MAP_ZOOM    = 11;
 
-// Base map
+// Base map gallery:  https://madewithmaplibre.com/basemaps/gallery
 // Dark
 const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
 // Classic
