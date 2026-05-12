@@ -5,9 +5,9 @@ const MAP_ZOOM    = 11;
 
 // Base map gallery:  https://madewithmaplibre.com/basemaps/gallery
 // Dark
-const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
+//const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/dark";
 // Classic
-//const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
+const BASEMAP_STYLE = "https://tiles.openfreemap.org/styles/liberty";
 
 // State
 let map;
